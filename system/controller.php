@@ -1,12 +1,13 @@
 <?php
 
 class Controller {
+
 	
 	public function loadModel($name)
 	{
 		require(APP_DIR .'models/'. strtolower($name) .'.php');
-
 		$model = new $name;
+		list($model->table) = explode('_',strtolower($name));
 		return $model;
 	}
 	
@@ -28,11 +29,25 @@ class Controller {
 		return $helper;
 	}
 	
-	public function redirect($loc)
-	{
+	public function redirect($loc){
 		global $config;
 		
 		header('Location: '. $config['base_url'] . $loc);
+	}
+
+	public function request($par = null){
+		if(is_array($par)){
+			$request = Array();
+			foreach($par as $field){
+				$request[$field] = isset($_REQUEST[$field]) ? $_REQUEST[$field] : false;
+			}
+			return $request;
+		}else if(is_null($par)){
+			return $_REQUEST;
+		}else{
+			return isset($_REQUEST[$par]) ? $_REQUEST[$par] : false;	
+		}
+		
 	}
     
 }
