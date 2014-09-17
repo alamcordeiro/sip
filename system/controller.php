@@ -3,12 +3,15 @@
 class Controller {
 
 	
-	public function loadModel($name)
+	public function loadModel( $name = '' )
 	{
-		require(APP_DIR .'models/'. strtolower($name) .'.php');
-		$model = new $name;
-		list($model->table) = explode('_',strtolower($name));
-		return $model;
+		if ( !class_exists( $name ) )
+		{
+			require(APP_DIR .'models/'. strtolower($name) .'.php');
+			$model = new $name;
+			list($model->table) = explode('_',strtolower($name));
+			return $model;
+		}
 	}
 	
 	public function loadView($name)

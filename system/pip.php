@@ -28,7 +28,8 @@ function pip() {
 	if(isset($segments[0]) && $segments[0] != '') $controller = $segments[0];
 	if(isset($segments[1]) && $segments[1] != '') $action = $segments[1];
 	
-	define('CURRENT_URL', BASE_URL.$controller);
+	define('CURRENT_URL', BASE_URL.'/'.$controller);
+	define('CURRENT_CONTROLLER', strtolower($controller));
 	define('VIEWS_DIR', 'application/views/');
 
 
@@ -65,7 +66,6 @@ function pip() {
 	
 	// Create object and call method
 	$obj = new $controller;
-	if(method_exists($obj,'__load')) $obj->__load();
     die(call_user_func_array(array($obj, $action), array_slice($segments, $offset_param)));
 }
 

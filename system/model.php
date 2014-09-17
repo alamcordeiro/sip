@@ -5,7 +5,6 @@ class Model {
 	public $pdo;
 	public $map;
 	private $fields;
-	private $rows_update;
 
 
 	public function __construct(){
@@ -18,9 +17,6 @@ class Model {
 		$this->map->relations = Array();
 		$this->map->limit 	  = 100;
 
-		$this->rows_update = false;
-		$this->fields = Array();
-
 		if(method_exists($this,'map')){
 			$this->map();
 		}
@@ -30,7 +26,6 @@ class Model {
 	public function pdo_connect(){
 
 		global $config;
-
 		$this->pdo = new PDO("mysql:host=".$config['db_host'].";dbname=".$config['db_name'].';charset=utf8', $config['db_username'], $config['db_password']);
 		$this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     	$this->pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
@@ -50,34 +45,16 @@ class Model {
 		$qry = 'SELECT '.$fields.' FROM `' . $table . '` '."\n";
 		return $qry;
 
-	}
+	}	
 
 	public function where_builder($filter){
 
-		$table 	= $this->map->table;
-
 		$keys = array_keys($filter);
-		foreach($keys as $k=>$v) $keys[$k] = $table.'.'.$v . ' = ?';
-		$where = count($filter) ? ' WHERE ' . implode(' AND ', $keys)."\n" : null;
+		foreach($keys as $k=>$v) $keys[$k] = $v . ' = ?';
+		$where = count($filter) ? ' WHERE ' . implode(' AND ', $keys)."\n" : false;
 		return $where;
 
 	}
-
-
-	public function update_builder(){
-
-		$fields = $this->fields;
-		$table 	= $this->map->table;
-
-		$set = Array();
-
-		foreach($fields as $field=>$value) $set[] = $field . ' = ?';
-		$qry = 'UPDATE `'.$table.'` SET '.implode(',',$set).' ';
-
-		return $qry;
-
-	}
-
 
 	public function innerjoin_builder(){
 
@@ -133,7 +110,6 @@ class Model {
 		}else{
 			$this->fields = Array($vars => $values);
 		}
-
 		return $this;
 	}
 
@@ -144,20 +120,6 @@ class Model {
 		$colums = implode(',',array_fill(0, count($data), '?'));
 		$values = array_values($data);
 
-		if($this->rows_update){
-			
-			foreach ($this->rows_update as $row) {
-				if(!$row) break;
-				$update = $this->update_builder();
-				$where  = $this->where_builder(Array('id' => $row['id']));
-				$qry = $update . $where;
-
-				$values_update = array_merge($values, Array($row['id']));
-				$result = $this->execute($qry, $values_update);
-				return $row['id'];
-			}
-			
-		}
 		$qry = 'INSERT IGNORE INTO `'.$this->map->table.'`('.$fields.') VALUES('.$colums.')';
 		$result = $this->execute($qry, $values);
 		if($result)
@@ -200,7 +162,6 @@ class Model {
 		$exec = $this->pdo->prepare($qry);
 		$exec->execute($pars);
 		$result = $exec->fetch();
-		$this->rows_update = Array($result);
 		return $result;
 
 	}
@@ -229,13 +190,22 @@ class Model {
 	}
 
 	public function query($qry){
+		$result = $this->pdo->prepare( $qry );
+		try {
+			$result->execute();
+		} catch (PDOException $e) {
+			die('Query failed: ' . $e->getMessage());
+		}
+
+		preg_match("/([^\s]+)/i", $qry, $method);
+		$method = $method[1];
 		
-		$result = mysql_query($qry) or die('MySQL Error: '. mysql_error());
-		$resultObjects = array();
-
-		while($row = mysql_fetch_object($result)) $resultObjects[] = $row;
-
-		return $resultObjects;
+		if ( $method == "UPDATE" ) return;
+		
+		if ( $method == "SELECT" ) return $result->fetchAll();
+		
+		if ( $method == "INSERT" ) return $this->pdo->lastInsertId();
+		
 	}
 
 	public function execute($qry, $par = Array()){

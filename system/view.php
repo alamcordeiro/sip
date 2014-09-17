@@ -18,6 +18,13 @@ class View {
 		}
 		return $this;
 	}
+	
+	public function get( $var )
+	{
+		if ( isset( $this->pageVars[$var] ) )
+			return $this->pageVars[$var];
+		return false;
+	}
 
 	public function html($val){
 		return htmlentities($val);
