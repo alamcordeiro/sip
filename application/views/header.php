@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     
-    <title>Welcome to PIP</title>
+    <title>Welcome to SIP</title>
     <meta name="description" content="">
     <meta name="author" content="">
     

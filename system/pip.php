@@ -3,7 +3,6 @@
 function pip() {
 	global $config;
     
-	
 	// Set default timezone;
 	//date_default_timezone_set($config['timezone']);
 	
@@ -16,8 +15,6 @@ function pip() {
 	$request_url = (isset($_SERVER['REQUEST_URI'])) ? $_SERVER['REQUEST_URI'] : '';
 	$script_url  = (isset($_SERVER['PHP_SELF'])) ? $_SERVER['PHP_SELF'] : '';
 	
-
-    	
 	// Get our url path and trim the / of the left and the right
 	if($request_url != $script_url) $url = trim(preg_replace('/'. str_replace('/', '\/', str_replace('index.php', '', $script_url)) .'/', '', $request_url, 1), '/');
 

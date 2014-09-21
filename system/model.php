@@ -2,28 +2,14 @@
 
 class Model {
 
-	public $pdo;
-	public $map;
-	private $fields;
-
-
-	public function __construct(){
-		
-		$this->pdo_connect();
-
-		$this->map = new stdClass();
-		$this->map->fields 	  = Array('*');
-		$this->map->orderby   = Array();
-		$this->map->relations = Array();
-		$this->map->limit 	  = 100;
-
-		if(method_exists($this,'map')){
-			$this->map();
-		}
-
-	}
+	private $pdo;
+	public $table, $fields, $orderby, $relations, $limit, $query;
 
 	public function pdo_connect(){
+		$this->fields 	  = Array('*');
+		$this->orderby   = Array();
+		$this->relations = Array();
+		$this->limit 	  = 100;
 
 		global $config;
 		$this->pdo = new PDO("mysql:host=".$config['db_host'].";dbname=".$config['db_name'].';charset=utf8', $config['db_username'], $config['db_password']);
@@ -32,9 +18,8 @@ class Model {
 	}
 
 	public function select_builder(){
-
-		$fields = $this->map->fields;
-		$table 	= $this->map->table;
+		$fields = $this->fields;
+		$table 	= $this->table;
 		
 		foreach($fields as $k => $value){
 			if(count(explode('.',$value)) !== 2 && $value !== '*')
@@ -42,86 +27,73 @@ class Model {
 		}
 		$fields = implode(',', $fields);
 
-		$qry = 'SELECT '.$fields.' FROM `' . $table . '` '."\n";
-		return $qry;
-
+		$this->query = 'SELECT '.$fields.' FROM `' . $table . '` '."\n";
+		return $this->query;
 	}	
 
 	public function where_builder($filter){
-
 		$keys = array_keys($filter);
 		foreach($keys as $k=>$v) $keys[$k] = $v . ' = ?';
 		$where = count($filter) ? ' WHERE ' . implode(' AND ', $keys)."\n" : false;
 		return $where;
-
 	}
 
 	public function innerjoin_builder(){
-
-		$estrangers = $this->map->relations;
-
-		$table 		= $this->map->table;
-		$qry 		= null;
+		$estrangers  = $this->relations;
+		$table 		 = $this->table;
+		$this->query = null;
 
 		foreach($estrangers as $field => $estranger){
 			list($estrangertable, $estrangerfield) = explode('.', $estranger);
 			$field = count(explode('.', $field)) > 1 ? $field : $table.'.'.$field;
 
-			$qry .= ' INNER JOIN ' . $estrangertable . ' ON '. $field . '=' . $estrangertable.'.'.$estrangerfield. "\n";
+			$this->query .= ' INNER JOIN ' . $estrangertable . ' ON '. $field . '=' . $estrangertable.'.'.$estrangerfield. "\n";
 		}
 
-
-
-		return $qry;
+		return $this->query;
 	}
 
 	public function orderby_builder(){
-
-		$qry = null;
-		$orderby = $this->map->orderby;
+		$this->query = null;
+		$orderby = $this->orderby;
 
 		if(count($orderby) > 1)
-			$qry = ' ORDER BY '. $orderby[0].' '.$orderby[1];
+			$this->query = ' ORDER BY '. $orderby[0].' '.$orderby[1];
 		else if(count($orderby) > 1)
-			$qry = ' ORDER BY '. $orderby[0].' ASC';
+			$this->query = ' ORDER BY '. $orderby[0].' ASC';
 
-		return $qry; 
-
+		return $this->query;
 	}
 
-
 	public function limit_builder(){
-
-		$limit = $this->map->limit;
-		$qry   = null;
+		$limit = $this->limit;
+		$this->query   = null;
 
 		if($limit)
-			$qry = ' LIMIT '. $limit;
+			$this->query = ' LIMIT '. $limit;
 
-		return $qry;
+		return $this->query;
 	}
 
 	public function set($vars, $values = Array()){
-
-		if(is_array($vars)){
+		if(is_array($vars))
 			$this->fields = array_combine($vars, $values);
-		}else if(is_array($this->fields)){
+		else if(is_array($this->fields))
 			$this->fields = array_merge($this->fields, Array($vars => $values));
-		}else{
+		else
 			$this->fields = Array($vars => $values);
-		}
+		
 		return $this;
 	}
 
 	public function persist(){
-
 		$data 	= $this->fields;
 		$fields = implode(',',array_keys($data));
 		$colums = implode(',',array_fill(0, count($data), '?'));
 		$values = array_values($data);
 
-		$qry = 'INSERT IGNORE INTO `'.$this->map->table.'`('.$fields.') VALUES('.$colums.')';
-		$result = $this->execute($qry, $values);
+		$this->query = 'INSERT IGNORE INTO `'.$this->table.'`('.$fields.') VALUES('.$colums.')';
+		$result = $this->execute($this->query, $values);
 		if($result)
 			return $this->pdo->lastInsertId();
 
@@ -129,14 +101,13 @@ class Model {
 	}
 
 	public function findAll($filter = Array()){
-
 		$select = $this->select_builder();
 		$where  = $this->where_builder($filter);
 		$limit  = $this->limit_builder();
 		$inner  = $this->innerjoin_builder();
 		$order  = $this->orderby_builder();
 		
-		$qry = $select . $inner . $where . $order .  $limit;
+		$this->query = $select . $inner . $where . $order . $limit;
 
 		$pars = array_values($filter);
 		
@@ -144,18 +115,16 @@ class Model {
 		$exec->execute($pars);
 		$result = $exec->fetchAll();
 		return $result;
-
 	}
 
 	public function find($filter = Array()){
-
 		$select = $this->select_builder();
 		$where  = $this->where_builder($filter);
 		$limit  = $this->limit_builder();
 		$inner  = $this->innerjoin_builder();
 		$order  = $this->orderby_builder();
 		
-		$qry = $select . $inner . $where . $order .  $limit;
+		$this->query = $select . $inner . $where . $order . $limit;
 
 		$pars = array_values($filter);
 		
@@ -163,53 +132,28 @@ class Model {
 		$exec->execute($pars);
 		$result = $exec->fetch();
 		return $result;
-
 	}
 
-	public function delete($filter = Array()){
-		
-		$table 	= $this->map->table;
+	public function delete($filter = Array()){		
+		$table 	= $this->table;
 		$where  = $this->where_builder($filter);
 		$limit  = $this->limit_builder();
 		
-		$qry = 'DELETE FROM ' . $table . $where .  $limit;
+		$this->query = 'DELETE FROM ' . $table . $where . $limit;
 
 		$pars = array_values($filter);
 
 		$exec = $this->pdo->prepare($qry);
 		$result = $exec->execute($pars);
 		return $result;
-
 	}
 
 	public function reset(){
-
 		$result = $this->execute('TRUNCATE TABLE `' . $this->table . '`');
 		return $result;
-
-	}
-
-	public function query($qry){
-		$result = $this->pdo->prepare( $qry );
-		try {
-			$result->execute();
-		} catch (PDOException $e) {
-			die('Query failed: ' . $e->getMessage());
-		}
-
-		preg_match("/([^\s]+)/i", $qry, $method);
-		$method = $method[1];
-		
-		if ( $method == "UPDATE" ) return;
-		
-		if ( $method == "SELECT" ) return $result->fetchAll();
-		
-		if ( $method == "INSERT" ) return $this->pdo->lastInsertId();
-		
 	}
 
 	public function execute($qry, $par = Array()){
-
 		try{
 			$exec = $this->pdo->prepare($qry);
 			$exec->execute($par);
@@ -218,7 +162,6 @@ class Model {
 			var_dump( $e->getMessage());
 			return false;
 		}
-
 	}
     
 }

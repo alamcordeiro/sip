@@ -13,23 +13,16 @@ class View {
 		if(is_array($var)){
 			foreach ($var as $name => $val)		
 				$this->pageVars[$name] = $val;
-		}else{	
+		}else
 			$this->pageVars[$var] = $val;
-		}
 		return $this;
 	}
 	
-	public function get( $var )
-	{
-		if ( isset( $this->pageVars[$var] ) )
-			return $this->pageVars[$var];
+	public function get($var){
+		if (isset($this->pageVars[$var]))
+			return htmlentities($this->pageVars[$var]);
 		return false;
 	}
-
-	public function html($val){
-		return htmlentities($val);
-	}
-
 
 	public function render(){
 		extract($this->pageVars);

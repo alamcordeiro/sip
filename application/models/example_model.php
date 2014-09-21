@@ -2,14 +2,14 @@
 
 class Example_model extends Model {
 
-	public function map(){
+	function __construct(){
 
-		$this->map->table  		= 'example_table';
-		$this->map->fields 		= Array('id', 'id_content', 'name');
-		$this->map->relations   = Array(
-										'id_content' => 'content_table.id'
-										);
-		return $this->map;
+		$this->table  		= 'example_table';
+		$this->fields 		= Array('id', 'id_content', 'name');
+		$this->relations   = Array(
+									'id_content' => 'content_table.id'
+								  );
+		return $this;
 	
 	}
 	

@@ -1,13 +1,14 @@
-#PIP
+#SIP
 
-PIP is a tiny application framework built for people who use a LAMP stack. PIP aims to be as simple as possible to set up and use.
+SIP is a tiny application framework built based on PIP Framework.
 
 Visit [http://gilbitron.github.com/PIP](http://gilbitron.github.com/PIP/) for more information and documentation.
 
 ## Requirements
 
 * PHP 5.1 or greater
-* MySQL 4.1.2 or greater
+* PHP PDO
+* MySQL 5.6 or greater
 * The mod_rewrite Apache module
 
 ## Installation
@@ -22,6 +23,4 @@ Visit [http://gilbitron.github.com/PIP](http://gilbitron.github.com/PIP/) to see
 
 ## License
 
-PIP is released under the MIT license.
-
-Want to say thanks? [Consider tipping me](https://www.gittip.com/gilbitron).
+SIP is released under the MIT license.
