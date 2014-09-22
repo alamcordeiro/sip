@@ -1,7 +1,7 @@
 <?php
 
 class Controller {
-	
+
 	public function loadModel($name)
 	{
 		if (!class_exists($name)){
@@ -11,13 +11,13 @@ class Controller {
 			return $model;
 		}
 	}
-	
+
 	public function loadView($name)
 	{
 		$view = new View($name);
 		return $view;
 	}
-		
+
 	public function redirect($loc)
 	{
 		global $config;
@@ -30,13 +30,13 @@ class Controller {
 			$request = Array();
 			foreach($par as $field)
 				$request[$field] = isset($_REQUEST[$field]) ? $_REQUEST[$field] : null;
-			
+
 			return $request;
 		}else if(is_null($par))
 			return $_REQUEST;
 		else
 			return isset($_REQUEST[$par]) ? $_REQUEST[$par] : null;	
-			
+
 	}
-    
+
 }

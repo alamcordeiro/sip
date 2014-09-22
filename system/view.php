@@ -16,10 +16,10 @@ class View {
 			foreach ($var as $name => $val)		
 				$this->pageVars[$name] = $val;
 		}else
-			$this->pageVars[$var] = $val;
+		$this->pageVars[$var] = $val;
 		return $this;
 	}
-	
+
 	public function get($var)
 	{
 		if (isset($this->pageVars[$var]))
@@ -35,5 +35,5 @@ class View {
 		require($this->template);
 		echo ob_get_clean();
 	}
-    
+
 }

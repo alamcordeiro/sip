@@ -3,7 +3,7 @@
 class Main extends Controller {
 
 	private $example;
-	
+
 	function __construct()
 	{
 		$this->example_model = $this->loadModel('Example_model');
@@ -17,7 +17,7 @@ class Main extends Controller {
 		$example = $this->example_model;
 		$example->set(Array('id_content', 'name'), Array('1','1'));
 		$example->persist();
-		
+
 	}
-    
+
 }

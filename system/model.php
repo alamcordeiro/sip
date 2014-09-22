@@ -15,14 +15,14 @@ class Model {
 		global $config;
 		$this->pdo = new PDO("mysql:host=".$config['db_host'].";dbname=".$config['db_name'].';charset=utf8', $config['db_username'], $config['db_password']);
 		$this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    	$this->pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+		$this->pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
 	}
 
 	public function selectBuilder()
 	{
 		$fields = $this->fields;
 		$table 	= $this->table;
-		
+
 		foreach($fields as $k => $value){
 			if(count(explode('.',$value)) !== 2 && $value !== '*')
 				$fields[$k] = $table.'.'.$value;
@@ -89,7 +89,7 @@ class Model {
 			$this->fields = array_merge($this->fields, Array($vars => $values));
 		else
 			$this->fields = Array($vars => $values);
-		
+
 		return $this;
 	}
 
@@ -115,11 +115,11 @@ class Model {
 		$limit  = $this->limitBuilder();
 		$inner  = $this->innerjoinBuilder();
 		$order  = $this->orderbyBuilder();
-		
+
 		$this->query = $select . $inner . $where . $order . $limit;
 
 		$pars = array_values($filter);
-		
+
 		$exec = $this->pdo->prepare($qry);
 		$exec->execute($pars);
 		$result = $exec->fetchAll();
@@ -133,11 +133,11 @@ class Model {
 		$limit  = $this->limitBuilder();
 		$inner  = $this->innerjoinBuilder();
 		$order  = $this->orderbyBuilder();
-		
+
 		$this->query = $select . $inner . $where . $order . $limit;
 
 		$pars = array_values($filter);
-		
+
 		$exec = $this->pdo->prepare($qry);
 		$exec->execute($pars);
 		$result = $exec->fetch();
@@ -149,7 +149,7 @@ class Model {
 		$table = $this->table;
 		$where = $this->whereBuilder($filter);
 		$limit = $this->limitBuilder();
-		
+
 		$this->query = 'DELETE FROM ' . $table . $where . $limit;
 
 		$pars = array_values($filter);
@@ -176,5 +176,5 @@ class Model {
 			return false;
 		}
 	}
-    
+
 }
