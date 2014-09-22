@@ -4,13 +4,13 @@ class Main extends Controller {
 
 	private $example;
 	
-	function __construct(){
-
+	function __construct()
+	{
 		$this->example_model = $this->loadModel('Example_model');
-
 	}
 
-	function index(){
+	function index()
+	{
 		$template = $this->loadView('main_view');
 		$template->render();
 
@@ -21,5 +21,3 @@ class Main extends Controller {
 	}
     
 }
-
-?>

@@ -2,7 +2,8 @@
 
 class Controller {
 	
-	public function loadModel($name){
+	public function loadModel($name)
+	{
 		if (!class_exists($name)){
 			require(APP_DIR .'models/'. strtolower($name) .'.php');
 			$model = new $name;
@@ -11,17 +12,20 @@ class Controller {
 		}
 	}
 	
-	public function loadView($name){
+	public function loadView($name)
+	{
 		$view = new View($name);
 		return $view;
 	}
 		
-	public function redirect($loc){
+	public function redirect($loc)
+	{
 		global $config;
 		header('Location: '. $config['base_url'] . $loc);
 	}
 
-	public function request($par = null){
+	public function request($par = null)
+	{
 		if(is_array($par)){
 			$request = Array();
 			foreach($par as $field)
@@ -36,5 +40,3 @@ class Controller {
 	}
     
 }
-
-?>

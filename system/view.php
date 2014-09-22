@@ -5,11 +5,13 @@ class View {
 	private $pageVars = array();
 	private $template;
 
-	public function __construct($template){
+	public function __construct($template)
+	{
 		$this->template = APP_DIR .'views/'. $template .'.php';
 	}
 
-	public function set($var, $val = null){
+	public function set($var, $val = null)
+	{
 		if(is_array($var)){
 			foreach ($var as $name => $val)		
 				$this->pageVars[$name] = $val;
@@ -18,13 +20,15 @@ class View {
 		return $this;
 	}
 	
-	public function get($var){
+	public function get($var)
+	{
 		if (isset($this->pageVars[$var]))
 			return htmlentities($this->pageVars[$var]);
 		return false;
 	}
 
-	public function render(){
+	public function render()
+	{
 		extract($this->pageVars);
 
 		ob_start();
@@ -33,5 +37,3 @@ class View {
 	}
     
 }
-
-?>

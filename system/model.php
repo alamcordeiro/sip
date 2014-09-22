@@ -5,11 +5,12 @@ class Model {
 	private $pdo;
 	public $table, $fields, $orderby, $relations, $limit, $query;
 
-	public function pdo_connect(){
-		$this->fields 	  = Array('*');
+	public function pdo_connect()
+	{
+		$this->fields 	 = Array('*');
 		$this->orderby   = Array();
 		$this->relations = Array();
-		$this->limit 	  = 100;
+		$this->limit 	 = 100;
 
 		global $config;
 		$this->pdo = new PDO("mysql:host=".$config['db_host'].";dbname=".$config['db_name'].';charset=utf8', $config['db_username'], $config['db_password']);
@@ -17,7 +18,8 @@ class Model {
     	$this->pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
 	}
 
-	public function select_builder(){
+	public function selectBuilder()
+	{
 		$fields = $this->fields;
 		$table 	= $this->table;
 		
@@ -31,14 +33,16 @@ class Model {
 		return $this->query;
 	}	
 
-	public function where_builder($filter){
+	public function whereBuilder($filter)
+	{
 		$keys = array_keys($filter);
 		foreach($keys as $k=>$v) $keys[$k] = $v . ' = ?';
-		$where = count($filter) ? ' WHERE ' . implode(' AND ', $keys)."\n" : false;
+		$where = count($filter) ? ' WHERE ' . implode(' AND ', $keys) . "\n" : false;
 		return $where;
 	}
 
-	public function innerjoin_builder(){
+	public function innerjoinBuilder()
+	{
 		$estrangers  = $this->relations;
 		$table 		 = $this->table;
 		$this->query = null;
@@ -53,7 +57,8 @@ class Model {
 		return $this->query;
 	}
 
-	public function orderby_builder(){
+	public function orderbyBuilder()
+	{
 		$this->query = null;
 		$orderby = $this->orderby;
 
@@ -65,7 +70,8 @@ class Model {
 		return $this->query;
 	}
 
-	public function limit_builder(){
+	public function limitBuilder()
+	{
 		$limit = $this->limit;
 		$this->query   = null;
 
@@ -75,7 +81,8 @@ class Model {
 		return $this->query;
 	}
 
-	public function set($vars, $values = Array()){
+	public function set($vars, $values = Array())
+	{
 		if(is_array($vars))
 			$this->fields = array_combine($vars, $values);
 		else if(is_array($this->fields))
@@ -86,7 +93,8 @@ class Model {
 		return $this;
 	}
 
-	public function persist(){
+	public function persist()
+	{
 		$data 	= $this->fields;
 		$fields = implode(',',array_keys($data));
 		$colums = implode(',',array_fill(0, count($data), '?'));
@@ -100,12 +108,13 @@ class Model {
 		return $result;
 	}
 
-	public function findAll($filter = Array()){
-		$select = $this->select_builder();
-		$where  = $this->where_builder($filter);
-		$limit  = $this->limit_builder();
-		$inner  = $this->innerjoin_builder();
-		$order  = $this->orderby_builder();
+	public function findAll($filter = Array())
+	{
+		$select = $this->selectBuilder();
+		$where  = $this->whereBuilder($filter);
+		$limit  = $this->limitBuilder();
+		$inner  = $this->innerjoinBuilder();
+		$order  = $this->orderbyBuilder();
 		
 		$this->query = $select . $inner . $where . $order . $limit;
 
@@ -117,12 +126,13 @@ class Model {
 		return $result;
 	}
 
-	public function find($filter = Array()){
-		$select = $this->select_builder();
-		$where  = $this->where_builder($filter);
-		$limit  = $this->limit_builder();
-		$inner  = $this->innerjoin_builder();
-		$order  = $this->orderby_builder();
+	public function find($filter = Array())
+	{
+		$select = $this->selectBuilder();
+		$where  = $this->whereBuilder($filter);
+		$limit  = $this->limitBuilder();
+		$inner  = $this->innerjoinBuilder();
+		$order  = $this->orderbyBuilder();
 		
 		$this->query = $select . $inner . $where . $order . $limit;
 
@@ -134,35 +144,37 @@ class Model {
 		return $result;
 	}
 
-	public function delete($filter = Array()){		
-		$table 	= $this->table;
-		$where  = $this->where_builder($filter);
-		$limit  = $this->limit_builder();
+	public function delete($filter = Array())
+	{		
+		$table = $this->table;
+		$where = $this->whereBuilder($filter);
+		$limit = $this->limitBuilder();
 		
 		$this->query = 'DELETE FROM ' . $table . $where . $limit;
 
 		$pars = array_values($filter);
 
-		$exec = $this->pdo->prepare($qry);
+		$exec   = $this->pdo->prepare($qry);
 		$result = $exec->execute($pars);
 		return $result;
 	}
 
-	public function reset(){
+	public function reset()
+	{
 		$result = $this->execute('TRUNCATE TABLE `' . $this->table . '`');
 		return $result;
 	}
 
-	public function execute($qry, $par = Array()){
-		try{
+	public function execute($qry, $par = Array())
+	{
+		try {
 			$exec = $this->pdo->prepare($qry);
 			$exec->execute($par);
 			return true;
-		}catch(PDOException $e){
-			var_dump( $e->getMessage());
+		} catch (PDOException $e) {
+			var_dump($e->getMessage());
 			return false;
 		}
 	}
     
 }
-?>

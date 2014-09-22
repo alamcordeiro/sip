@@ -1,6 +1,7 @@
 <?php
 
-function pip() {
+function pip() 
+{
 	global $config;
     
 	// Set default timezone;
@@ -65,5 +66,3 @@ function pip() {
 	$obj = new $controller;
     die(call_user_func_array(array($obj, $action), array_slice($segments, $offset_param)));
 }
-
-?>

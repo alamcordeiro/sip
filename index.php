@@ -1,6 +1,6 @@
 <?php
 /*
- * PIP v0.5.3
+ * SIP v0.0.1
  */
 
 //Start the Session
@@ -19,8 +19,6 @@ require(ROOT_DIR .'system/pip.php');
 
 // Define base URL
 global $config;
-define('BASE_URL', $config['base_url']);
+define('BASE_URL', "http://" . $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI']);
 
 pip();
-
-?>
