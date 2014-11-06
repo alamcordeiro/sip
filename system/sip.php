@@ -1,11 +1,8 @@
 <?php
 
-function pip() 
+function sip() 
 {
 	global $config;
-
-// Set default timezone;
-//date_default_timezone_set($config['timezone']);
 
 // Set our defaults
 	$controller = $config['default_controller'];
@@ -26,6 +23,7 @@ function pip()
 	if(isset($segments[0]) && $segments[0] != '') $controller = $segments[0];
 	if(isset($segments[1]) && $segments[1] != '') $action = $segments[1];
 
+	define('BASE_URL', 'http://' . $_SERVER['SERVER_NAME'] . dirname($_SERVER['PHP_SELF']).'/');
 	define('CURRENT_URL', BASE_URL.'/'.$controller);
 	define('CURRENT_CONTROLLER', strtolower($controller));
 	define('VIEWS_DIR', 'application/views/');
@@ -37,32 +35,31 @@ function pip()
 /* Set start segments param
 example.com/class/function/param
 */
-$offset_param = 2;
-
-require_once($path);
-} else {
+		$offset_param = 2;
+		require_once($path);
+	} else {
 //Use action in implicit default controller
 
 /* 
 Set start segments param on implicit default controller
 example.com/function/param
 */
-$offset_param = 1;
+		$offset_param = 1;
 
-$action		= $controller; 
-$controller = $config['default_controller'];
-require_once(APP_DIR . 'controllers/' . $controller . '.php');
-}
+		$action		= $controller; 
+		$controller = $config['default_controller'];
+		require_once(APP_DIR . 'controllers/' . $controller . '.php');
+	}
 
 
-if(!method_exists($controller, $action)){
-	$action = 'index';
-	$offset_param = 0;
-}
+	if(!method_exists($controller, $action)){
+		$action = 'index';
+		$offset_param = 0;
+	}
 
-define('CURRENT_PAGE', $controller.'/'.$action);
+	define('CURRENT_PAGE', $controller.'/'.$action);
 
 // Create object and call method
-$obj = new $controller;
-die(call_user_func_array(array($obj, $action), array_slice($segments, $offset_param)));
+	$obj = new $controller;
+	die(call_user_func_array(array($obj, $action), array_slice($segments, $offset_param)));
 }
